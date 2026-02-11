@@ -1,0 +1,24 @@
+{
+  "name": "@trinity/integration-test",
+  "version": "0.1.0",
+  "description": "End-to-end Trinity Genesis integration tests",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test:e2e": "node dist/e2e-ritual.js",
+    "test:bootstrap": "node dist/bootstrap-test.js",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@trinity/core": "*",
+    "@trinity/dispatcher": "*",
+    "@trinity/swarmide2-services": "*",
+    "@trinity/mind-shrine": "*",
+    "@trinity/law-shrine": "*",
+    "@trinity/forge-shrine": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}

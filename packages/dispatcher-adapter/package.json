@@ -1,0 +1,20 @@
+{
+  "name": "@trinity/dispatcher",
+  "version": "0.1.0",
+  "description": "Dispatcher adapter mapping Nex primitives to SwarmIDE2 services",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "dev": "tsc --watch",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@trinity/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "vitest": "^0.34.6"
+  }
+}

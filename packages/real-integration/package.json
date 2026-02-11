@@ -1,0 +1,21 @@
+{
+  "name": "@trinity/real-integration",
+  "version": "0.1.0",
+  "description": "Real system integrations (Nex, SwarmIDE2, Thrones, Orisa, StoryWeaver)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test:bootstrap": "node dist/bootstrap-ritual.js",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@trinity/core": "*",
+    "@trinity/mind-shrine": "*",
+    "@trinity/law-shrine": "*",
+    "@trinity/forge-shrine": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}

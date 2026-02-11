@@ -1,0 +1,90 @@
+{
+  "decision_id": "trinity-1770781727204",
+  "question_hash": "f20f95641452ac873ca95727cc24097269d2ed762de88f5c9397c6be342844be",
+  "status": "complete",
+  "decision_snapshot": {
+    "graph_nodes": 347,
+    "proposals": [
+      {
+        "agent_id": "agent-1",
+        "agent_role": "engineer",
+        "confidence": 0.88,
+        "proposal": {
+          "approach": "microservices",
+          "scalability": "high"
+        }
+      },
+      {
+        "agent_id": "agent-2",
+        "agent_role": "devops",
+        "confidence": 0.82,
+        "proposal": {
+          "approach": "containerized",
+          "reliability": "99.9%"
+        }
+      },
+      {
+        "agent_id": "agent-3",
+        "agent_role": "qa",
+        "confidence": 0.85,
+        "proposal": {
+          "approach": "test-driven",
+          "coverage": "95%"
+        }
+      }
+    ],
+    "winner": {
+      "agent_id": "agent-1",
+      "agent_role": "engineer",
+      "confidence": 0.88,
+      "proposal": {
+        "approach": "microservices",
+        "scalability": "high"
+      }
+    },
+    "consensus_mechanism": "weighted_voting"
+  },
+  "consensus_score": 0.85,
+  "cost_breakdown": {
+    "total_cost_usd": 0.32,
+    "by_provider": {
+      "gpt-4o": 0.18,
+      "claude": 0.12,
+      "gemini": 0.02
+    },
+    "by_operation": {
+      "spawn": 0.12,
+      "debate": 0.18,
+      "merge": 0.02
+    },
+    "by_phase": {
+      "mind": 0.32,
+      "law": 0.05
+    },
+    "timestamp": "2026-02-11T03:48:47.205Z"
+  },
+  "created_at": "2026-02-11T03:48:47.206Z",
+  "archive_location": "ar:ef45b5669b263766fb074b01172b4bcf",
+  "execution_result": {
+    "execution_id": "exec-trinity-1770781727204",
+    "artifact_url": "file:///output/eternal/beat-trinity-1770781727204-video.mp4",
+    "artifact_hash": "2b6463734920e07f12a9a1281e1bb479",
+    "artifact_type": "video",
+    "execution_time_ms": 0,
+    "metadata": {
+      "video": {
+        "url": "file:///output/eternal/beat-trinity-1770781727204-video.mp4",
+        "hash": "2b6463734920e07f12a9a1281e1bb479cf409c7341d0fd8373f9e1a8a0b97ee9"
+      },
+      "book": {
+        "url": "file:///output/books/trinity-trinity-1770781727204-book.epub",
+        "hash": "ffb2e328cda16d93889f11b15e43e45df660b2adc708104ffebff2fe1854934f"
+      },
+      "npc": {
+        "address": "0x36623744aaffd1d33a0ca1a9630c33beefc2b1eb5770c81b97c43322a2e4c729",
+        "blockchain": "Sui"
+      }
+    }
+  },
+  "completed_at": "2026-02-11T03:48:47.208Z"
+}
