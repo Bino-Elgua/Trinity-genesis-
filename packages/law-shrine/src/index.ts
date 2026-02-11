@@ -7,6 +7,7 @@
 
 import crypto from "crypto";
 import { RitualPayload, updatePayloadStatus } from "@trinity/core";
+import { getAllAdapters, LLMAdapter, getAvailableAdapters } from "@trinity/llm-adapter";
 
 // ============================================================================
 // TWELVE THRONES TYPES
@@ -48,9 +49,9 @@ export interface ConsensusResult {
 const THRONES: Throne[] = [
   {
     id: 1,
-    name: "Ọbàtálá (Gemini 3 Pro)",
-    provider: "gemini",
-    model: "gemini-3-pro",
+    name: "Ọbàtálá (Claude 3.5 Sonnet)",
+    provider: "anthropic",
+    model: "claude-3-5-sonnet",
     weight: 2.0,
   },
   {
@@ -62,72 +63,72 @@ const THRONES: Throne[] = [
   },
   {
     id: 3,
-    name: "Ògún (Claude 3.5 Sonnet)",
-    provider: "anthropic",
-    model: "claude-3-5-sonnet",
+    name: "Ògún (Llama 3.3 70B)",
+    provider: "groq",
+    model: "llama-3.3-70b",
     weight: 1.7,
   },
   {
     id: 4,
-    name: "Ọ̀ṣun (Groq Llama 3.3)",
-    provider: "groq",
-    model: "llama-3.3-70b",
+    name: "Ọ̀ṣun (DeepSeek-R1)",
+    provider: "together",
+    model: "deepseek-r1",
     weight: 1.5,
   },
   {
     id: 5,
-    name: "Ọya (Mistral Large)",
-    provider: "mistral",
-    model: "mistral-large",
+    name: "Ọya (Qwen3-235B)",
+    provider: "together",
+    model: "qwen3-235b",
     weight: 1.4,
   },
   {
     id: 6,
-    name: "Yemọja (DeepSeek)",
-    provider: "deepseek",
-    model: "deepseek-chat",
+    name: "Yemọja (Kimi-K2.5)",
+    provider: "together",
+    model: "kimi-k2.5",
     weight: 1.3,
   },
   {
     id: 7,
-    name: "Ṣàngó (Meta Llama 3.1)",
-    provider: "meta",
-    model: "llama-3.1-405b",
+    name: "Ṣàngó (Claude 3.5 Sonnet)",
+    provider: "anthropic",
+    model: "claude-3-5-sonnet",
     weight: 1.6,
   },
   {
     id: 8,
-    name: "Ọrunmila (Cohere Command R+)",
-    provider: "cohere",
-    model: "command-r-plus",
+    name: "Ọrunmila (GPT-4o)",
+    provider: "openai",
+    model: "gpt-4o",
     weight: 1.4,
   },
   {
     id: 9,
-    name: "Olódùmarè (Grok 3)",
-    provider: "xai",
-    model: "grok-3",
+    name: "Olódùmarè (DeepSeek-R1)",
+    provider: "together",
+    model: "deepseek-r1",
     weight: 1.5,
   },
   {
     id: 10,
-    name: "Àálu (Perplexity Pro)",
-    provider: "perplexity",
-    model: "sonar-pro",
+    name: "Àálu (Qwen3-235B)",
+    provider: "together",
+    model: "qwen3-235b",
     weight: 1.3,
   },
   {
     id: 11,
-    name: "Òṛíṣà (Together AI)",
-    provider: "together",
-    model: "qwen-2-72b",
+    name: "Òṛíṣà (Llama 3.3 70B)",
+    provider: "groq",
+    model: "llama-3.3-70b",
     weight: 1.2,
   },
   {
     id: 12,
-    name: "Àṣẹ (Oracle Llama)",
-    provider: "oracle",
-    model: "llama-3.2-instruct",
+    name: "Àṣẹ (Kimi-K2.5)",
+    provider: "together",
+    model: "kimi-k2.5",
     weight: 1.1,
   },
 ];
@@ -199,38 +200,79 @@ export class LawShrine {
   }
 
   /**
-   * Generate votes from all 12 thrones
+   * Generate votes from all 12 thrones via real LLM calls
    */
   private async generateConsensusVotes(payload: RitualPayload): Promise<Vote[]> {
-    const consensus_score = payload.consensus_score || 0.75;
+    const question = payload.decision_snapshot?.question || "Unknown question";
+    const proposals = payload.decision_snapshot?.proposals || [];
 
-    return this.thrones.map((throne) => {
-      // Simulate each throne's evaluation
-      const throne_confidence = consensus_score + (Math.random() - 0.5) * 0.1; // ±0.05
-      const answer =
-        throne_confidence > 0.8
-          ? "YES"
-          : throne_confidence < 0.6
-            ? "NO"
-            : "UNCERTAIN";
+    const consensus_context = `
+Current consensus estimate: ${payload.consensus_score?.toFixed(2) || "0.75"}
+Proposals analyzed: ${proposals.length}
+Task: Provide independent vote on proposal viability
+    `.trim();
 
-      const weighted_vote =
-        answer === "YES"
-          ? throne.weight
-          : answer === "NO"
-            ? -throne.weight
-            : 0;
+    console.log(`[LawShrine] Submitting to ${this.thrones.length} thrones for real voting...`);
 
-      return {
-        throneId: throne.id,
-        throneName: throne.name,
-        answer,
-        confidence: Math.min(throne_confidence, 1),
-        reasoning: `${throne.name} evaluated via ${throne.model}`,
-        weight: throne.weight,
-        weightedVote: weighted_vote,
-      };
+    // Get all LLM adapters
+    const adapters = getAllAdapters();
+
+    // Parallel votes from all models
+    const votePromises = this.thrones.map((throne, idx) => {
+      const adapter = adapters[idx % adapters.length]; // Round-robin assignment
+
+      return adapter
+        .castVote({
+          throne_name: throne.name,
+          question,
+          proposals: proposals.map((p) => {
+            const str = JSON.stringify(p);
+            return str.length > 100 ? str.slice(0, 100) + "..." : str;
+          }),
+          consensus_context,
+        })
+        .then((response) => {
+          console.log(
+            `[${throne.name}] ${response.answer} (${response.confidence.toFixed(2)}) - $${response.cost_usd.toFixed(4)}`
+          );
+
+          const weighted_vote =
+            response.answer === "YES"
+              ? throne.weight
+              : response.answer === "NO"
+                ? -throne.weight
+                : 0;
+
+          return {
+            throneId: throne.id,
+            throneName: throne.name,
+            answer: response.answer,
+            confidence: response.confidence,
+            reasoning: response.reasoning,
+            weight: throne.weight,
+            weightedVote: weighted_vote,
+          };
+        })
+        .catch((error) => {
+          console.warn(`[${throne.name}] Failed: ${error}, defaulting to UNCERTAIN`);
+
+          return {
+            throneId: throne.id,
+            throneName: throne.name,
+            answer: "UNCERTAIN" as const,
+            confidence: 0.5,
+            reasoning: `Failed to query ${throne.name}, defaulting to uncertainty`,
+            weight: throne.weight,
+            weightedVote: 0,
+          };
+        });
     });
+
+    // Wait for all votes in parallel
+    const votes = await Promise.all(votePromises);
+
+    console.log(`[LawShrine] All ${votes.length} thrones voted`);
+    return votes;
   }
 
   /**
